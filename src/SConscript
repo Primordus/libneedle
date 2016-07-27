@@ -1,0 +1,23 @@
+Import('env')
+this_env = env.Clone()
+
+
+# Other build variables for building binaries / libraries:
+
+INCLUDES = [
+    '#/include/'
+]
+
+
+# Build all objects in this folder:
+
+LIB_NAME = 'needle'
+this_env.Append(CPPPATH=INCLUDES)
+SOURCES = Glob('*.c')
+OBJECTS = this_env.SharedObject(SOURCES)
+
+
+# Build binary / library
+
+this_env.SharedLibrary(LIB_NAME, OBJECTS)
+
