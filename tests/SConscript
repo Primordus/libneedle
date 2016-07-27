@@ -1,0 +1,28 @@
+Import('env')
+
+BIN_NAME = 'needle_tests'
+
+INCLUDES = [
+    '#deps/',
+    '#include/'
+]
+
+LIBRARIES = [
+    #'c',
+    'needle'
+]
+
+LIBRARY_PATHS = [
+    '#/bin/src/',
+    '/usr/lib/musl/lib/'
+]
+
+test_env = env.Clone()
+test_env.Append(CPPPATH=INCLUDES)
+
+
+# Build binary / library
+
+test_env.Program(BIN_NAME, source=Glob('*.c'), 
+                 LIBS=LIBRARIES, LIBPATH=LIBRARY_PATHS)
+

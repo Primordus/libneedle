@@ -3,11 +3,11 @@ import os
 
 # Compiler settings:
 
-C_COMPILER = 'clang'
+C_COMPILER = 'musl-clang'
 CPP_COMPILER = 'clang++'
 ENABLED_C_WARNINGS = '-Werror -Weverything '
 ENABLED_CPP_WARNINGS = '-Werror -Weverything '
-SUPPRESSED_C_WARNINGS = '  -Wno-reserved-id-macro '
+SUPPRESSED_C_WARNINGS = '  -Wno-reserved-id-macro -Wno-unused-command-line-argument'
 SUPPRESSED_CPP_WARNINGS = '  '
 C_WARNINGS = ENABLED_C_WARNINGS + SUPPRESSED_C_WARNINGS
 CPP_WARNINGS = ENABLED_CPP_WARNINGS + SUPPRESSED_CPP_WARNINGS
@@ -50,7 +50,7 @@ test_env = common_env.Clone()
 
 env_dict = {
     'src': src_env,
-    #'tests': test_env
+    'tests': test_env
 }
 
 for subdir, env in env_dict.iteritems():
