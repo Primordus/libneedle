@@ -12,6 +12,7 @@
  */
 
 static const int THREAD_NOT_VALID = (int) 0x1000;
+static const int CALLBACK_NOT_VALID = (int) 0x1001;
 
 
 struct thread;
@@ -26,7 +27,7 @@ typedef thrd_start_t thread_start_t;
 
 int thread_new(struct thread **t);
 size_t get_thread_data_size(void);
-void thread_free(struct thread *t);
+void thread_free(struct thread **t);
 
 
 /**
@@ -35,7 +36,7 @@ void thread_free(struct thread *t);
 
 int thread_create(struct thread *t, thread_start_t callback, void *arg);
 int thread_equal(const struct thread * const t1, const struct thread * const t2);  // non-0 if equal, else 0
-int thread_current(struct thread *t);
+int thread_current(struct thread **t);
 int thread_sleep(const struct timespec* time_point, struct timespec *remaining);
 void thread_yield(void);
 _Noreturn void thread_exit(int result);

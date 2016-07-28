@@ -7,7 +7,7 @@
  *
  * For the rest API is the same as C11 cnd_t API.
  */
-static const int COND_VAR_NOT_VALID = (int) 0x1002;
+static const int COND_VAR_NOT_VALID = (int) 0x1003;
 
 
 struct cond_var;

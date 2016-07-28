@@ -1,22 +1,20 @@
 #include <minunit.h>
 #include <stdio.h>
+#include "thread_test_suite.h"
+#include "mutex_test_suite.h"
+#include "cond_var_test_suite.h"
+
 
 #define NOT_USED(x) (void)x
-
 
 int tests_run = 0;
 
 
-TEST (thread_usage) 
-{
-    ASSERT(2 == 0, "reason goes here");
-    return 0;
-}
-
-
 TEST (run_all_tests)
 {
-    RUN_TEST(thread_usage);
+    RUN_TEST(thread_test_suite);
+    RUN_TEST(mutex_test_suite);
+    RUN_TEST(cond_var_test_suite);
     return 0;
 }
 

@@ -9,7 +9,7 @@
  * For the rest API is the same as C11 API.
  */
 
-static const int MUTEX_NOT_VALID = (int) 0x1001;
+static const int MUTEX_NOT_VALID = (int) 0x1002;
 
 
 typedef enum

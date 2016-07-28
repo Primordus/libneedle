@@ -1,4 +1,6 @@
 #pragma once
+#include <stdio.h>
+
 
 /*
  * MinUnit testing framework.
@@ -22,8 +24,8 @@ extern int tests_run;
 #define DO_STRINGIFY(x) #x
 #define STRINGIFY(x) DO_STRINGIFY(x)
 
-#define TEST(name_test) static const char *name_test(void); \
-                        static const char *name_test(void)
+#define TEST(name_test) const char *name_test(void); \
+                        const char *name_test(void)
 #define RUN_TEST(test) mu_run_test(test); printf(".")
 #define ASSERT(test, msg) mu_assert("Test failed: " STRINGIFY(test) " at " \
                                     __FILE__ ":" STRINGIFY(__LINE__) \
