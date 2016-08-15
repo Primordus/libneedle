@@ -1,5 +1,10 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" 
+{
+#endif
+
 
 /**
  * Wrapper API around mtx_t.
@@ -43,4 +48,8 @@ int mutex_trylock(struct mutex *m);
 int mutex_unlock(struct mutex *m);
 void mutex_destroy(struct mutex *m);
 
+
+#ifdef __cplusplus
+}
+#endif
 

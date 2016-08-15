@@ -1,6 +1,11 @@
 #pragma once
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 
 /**
  * This module contains wrapper functions around the C11 thread API that use an 
@@ -38,4 +43,8 @@ void thread_yield(void);
 _Noreturn void thread_exit(int result);
 int thread_detach(const struct thread *t);
 int thread_join(const struct thread *t, int *res);
+
+#ifdef __cplusplus
+}
+#endif
 

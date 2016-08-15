@@ -8,6 +8,10 @@
  * For the rest API is the same as C11 cnd_t API.
  */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 struct timespec;
 struct mutex;
@@ -37,4 +41,7 @@ int cond_var_timedwait(struct cond_var *restrict cv, struct mutex *restrict m,
                        const struct timespec *restrict time_point);
 void cond_var_destroy(struct cond_var* cv);
 
+#ifdef __cplusplus
+}
+#endif
 
