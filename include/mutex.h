@@ -29,7 +29,7 @@ struct timespec;
 
 int mutex_new(struct mutex **m);
 size_t get_mutex_data_size(void);
-void mutex_free(struct mutex *m);
+void mutex_free(struct mutex **m);
 
 
 /**
