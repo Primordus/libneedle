@@ -1,5 +1,4 @@
 #pragma once
-#include <threads.h>
 #include <stdint.h>
 
 
@@ -11,13 +10,10 @@
  * API is exactly the same for the rest.
  */
 
-static const int THREAD_NOT_VALID = (int) 0x1000;
-static const int CALLBACK_NOT_VALID = (int) 0x1001;
-
 
 struct thread;
 struct timespec;
-typedef thrd_start_t thread_start_t;
+typedef int (*thread_start_t)(void *arg);
 
 
 /**

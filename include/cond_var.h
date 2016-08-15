@@ -7,11 +7,11 @@
  *
  * For the rest API is the same as C11 cnd_t API.
  */
-static const int COND_VAR_NOT_VALID = (int) 0x1003;
 
 
-struct cond_var;
+struct timespec;
 struct mutex;
+struct cond_var;
 
 
 /**
@@ -21,12 +21,13 @@ struct mutex;
 
 int cond_var_new(struct cond_var **cv);
 size_t get_cond_var_data_size(void);
-void cond_var_free(struct cond_var *cv);
+void cond_var_free(struct cond_var **cv);
 
 
 /**
  * Wrapper API around c11 cnd_t API.
  */
+
 
 int cond_var_init(struct cond_var *cv);
 int cond_var_signal(struct cond_var *cv);

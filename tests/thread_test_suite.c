@@ -1,6 +1,7 @@
-#include "thread_test_suite.h"
+#include <stdlib.h>  // malloc, free
+#include <time.h>    // struct timespec
 #include <thread.h>
-#include <stdlib.h>
+#include "thread_test_suite.h"
 
 
 static int a = 0;
@@ -34,13 +35,13 @@ TEST (thread_creation_and_destruction_test)
 {
     struct thread *t = NULL;
     int res;
-    ASSERT (THREAD_NOT_VALID == thread_create(NULL, NULL, NULL), "thread_create should fail if only NULL passed in");   
-    ASSERT (THREAD_NOT_VALID == thread_create(NULL, increment, NULL), "thread_create should fail if thread arg == NULL");   
+    ASSERT (thread_create(NULL, NULL, NULL) != 0, "thread_create should fail if only NULL passed in");   
+    ASSERT (thread_create(NULL, increment, NULL) != 0, "thread_create should fail if thread arg == NULL");   
 
     thread_new(&t);
     ASSERT (thread_create(t, increment, NULL) == 0, "creating thread should succeed");
 
-    ASSERT (CALLBACK_NOT_VALID == thread_create(t, NULL, NULL), "thread_create should fail if callback == NULL");   
+    ASSERT (thread_create(t, NULL, NULL) != 0, "thread_create should fail if callback == NULL");   
     ASSERT(thread_join(t, &res) == 0, "thread_join should succeed");
     ASSERT (res == INCREMENT_RESULT, "result should be updated to the value returned by callback");
     ASSERT (a == 1, "variable should be modified by the thread");
@@ -54,16 +55,16 @@ TEST (thread_equal_test)
 {
     struct thread *t1 = NULL;
     struct thread *t2 = NULL;
-    ASSERT (THREAD_NOT_VALID == thread_equal(NULL, NULL), "thread_equal should fail when NULLs passed in");
-    ASSERT (THREAD_NOT_VALID == thread_equal(t1, NULL), "thread_equal should fail when a NULL is passed in");
-    ASSERT (THREAD_NOT_VALID == thread_equal(NULL, t2), "thread_equal should fail when a NULL is passed in");
+    ASSERT (thread_equal(NULL, NULL) != 0, "thread_equal should fail when NULLs passed in");
+    ASSERT (thread_equal(t1, NULL) != 0, "thread_equal should fail when a NULL is passed in");
+    ASSERT (thread_equal(NULL, t2) != 0, "thread_equal should fail when a NULL is passed in");
 
     thread_new(&t1);
     thread_new(&t2);
     thread_create(t1, increment, NULL);
     thread_create(t2, increment, NULL);
-    ASSERT (0 != thread_equal(t1, t1), "thread equal returns non-zero if they are equal");
-    ASSERT (0 == thread_equal(t1, t2), "thread equal returns zero if not equal");
+    ASSERT (thread_equal(t1, t1) != 0, "thread equal returns non-zero if they are equal");
+    ASSERT (thread_equal(t1, t2) == 0, "thread equal returns zero if not equal");
     thread_join(t1, NULL);
     thread_join(t2, NULL);
     thread_free(&t1);
@@ -73,14 +74,14 @@ TEST (thread_equal_test)
 
 TEST (thread_current_test)
 {
-    ASSERT (THREAD_NOT_VALID == thread_current(NULL), "passing NULL to thread_current");
+    ASSERT (thread_current(NULL) != 0, "passing NULL to thread_current");
     struct thread *t1 = NULL;
     struct thread *t2 = NULL;
     thread_new(&t1);
-    ASSERT (0 == thread_current(&t1), "thread_current should succeed");
+    ASSERT (thread_current(&t1) == 0, "thread_current should succeed");
     thread_new(&t2);
     thread_create(t2, increment, NULL);
-    ASSERT (0 == thread_equal(t1, t2), "current thread should be different than a spawned thread");
+    ASSERT (thread_equal(t1, t2) == 0, "current thread should be different than a spawned thread");
     thread_join(t2, NULL);
     thread_free(&t1);
     thread_free(&t2);
@@ -89,7 +90,7 @@ TEST (thread_current_test)
 
 TEST (thread_detach_test)
 {
-    ASSERT (THREAD_NOT_VALID == thread_detach(NULL), "passing NULL to thread_detach");
+    ASSERT (thread_detach(NULL) != 0, "passing NULL to thread_detach");
     struct thread *t;
     thread_new(&t);
     thread_create(t, increment, NULL);
@@ -103,7 +104,7 @@ TEST (thread_detach_test)
 TEST (thread_join_test)
 {
     // good cases already tested in other tests
-    ASSERT (THREAD_NOT_VALID == thread_join(NULL, NULL), "passing NULL to thread_join");
+    ASSERT (thread_join(NULL, NULL) != 0, "passing NULL to thread_join should fail");
     return 0;
 }
 

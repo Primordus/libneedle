@@ -38,7 +38,7 @@ void mutex_free(struct mutex **m)
 
 int mutex_init(struct mutex *m, mutex_type type)
 {
-    if (!m) return MUTEX_NOT_VALID;
+    if (!m) return 1;
     switch (type)
     {
     case PLAIN:

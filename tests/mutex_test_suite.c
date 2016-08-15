@@ -7,8 +7,8 @@
 static struct mutex *m = NULL;
 static struct timespec timepoint;
 
-void cleanup_mutex(void);
-struct timespec *get_timepoint(void);
+static void cleanup_mutex(void);
+static struct timespec *get_timepoint(void);
 
 
 void cleanup_mutex(void)
@@ -64,9 +64,9 @@ TEST (mutex_free_test)
     mutex_free(NULL);  // should be safe to pass in NULL
 
     mutex_new(&m);
-    ASSERT (m != NULL, "pointer shouldnt be 0 after mutex_new");
+    ASSERT(m != NULL, "pointer shouldnt be NULL after mutex_new");
     mutex_free(&m);
-    ASSERT (m == NULL, "pointer should be set to NULL after freeing");
+    ASSERT(m == NULL, "pointer should be set to NULL after freeing");
     return 0;
 }
 
