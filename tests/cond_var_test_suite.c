@@ -11,7 +11,7 @@ static struct mutex *m;
 static struct thread *t;
 
 static void make_dummy_thread(thread_start_t cb);
-static int dummy_thread_cb(void *arg);
+static void dummy_thread_cb(void *arg);
 static void cleanup_cv(void);
 static void cleanup_mutex(void);
 static void cleanup_thread(void);
@@ -25,14 +25,12 @@ void make_dummy_thread(thread_start_t cb)
 }
 
 
-int dummy_thread_cb(void *arg)
+void dummy_thread_cb(void *arg)
 {
     (void)arg;
     struct timespec ms = { .tv_sec = 0, .tv_nsec = 1000000 };
-    struct timespec remaining;
-    thread_sleep(&ms, &remaining);
+    thread_sleep(&ms);
     cond_var_signal(cv);
-    return 0;
 }
 
 
@@ -53,8 +51,7 @@ void cleanup_mutex(void)
 
 void cleanup_thread(void)
 {
-    int res = 0;
-    thread_join(t, &res);
+    thread_join(t);
     thread_free(&t);
 }
 
@@ -131,7 +128,6 @@ TEST(cv_wait)
     cond_var_init(cv);
     mutex_new(&m);
     mutex_init(m, PLAIN);
-    mutex_lock(m);
 
     ASSERT(cond_var_wait(NULL, NULL) != 0, "returns non-zero if NULLs passed in");
     ASSERT(cond_var_wait(NULL, m) != 0, "returns non-zero if a NULL is passed in");
@@ -153,8 +149,7 @@ TEST(cv_timedwait)
     cond_var_new(&cv);
     cond_var_init(cv);
     mutex_new(&m);
-    mutex_init(m, PLAIN);
-    mutex_lock(m);
+    mutex_init(m, TIMED);
 
     ASSERT(cond_var_timedwait(NULL, NULL, NULL) != 0, "returns non-zero if NULLs passed in");
     ASSERT(cond_var_timedwait(NULL, m, NULL) != 0, "returns non-zero if a NULL is passed in");

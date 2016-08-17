@@ -8,13 +8,14 @@ INCLUDES = [
 ]
 
 LIBRARIES = [
-    #'c',
+    'c++',
+    'c++abi',
     'needle'
 ]
 
 LIBRARY_PATHS = [
-    '#/bin/src/',
-    '/usr/lib/musl/lib/'
+    '/usr/lib',
+    '#/bin/src/'
 ]
 
 test_env = env.Clone()

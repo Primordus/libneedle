@@ -5,14 +5,12 @@
 
 
 static int a = 0;
-static const int INCREMENT_RESULT = 1000;
 
-int increment(void *arg);
-int increment(void *arg)
+void increment(void *arg);
+void increment(void *arg)
 {
     (void) arg;
     a++;
-    thread_exit(INCREMENT_RESULT);
 }
 
 
@@ -34,7 +32,6 @@ TEST (thread_new_and_free_test)
 TEST (thread_creation_and_destruction_test)
 {
     struct thread *t = NULL;
-    int res;
     ASSERT (thread_create(NULL, NULL, NULL) != 0, "thread_create should fail if only NULL passed in");   
     ASSERT (thread_create(NULL, increment, NULL) != 0, "thread_create should fail if thread arg == NULL");   
 
@@ -42,8 +39,7 @@ TEST (thread_creation_and_destruction_test)
     ASSERT (thread_create(t, increment, NULL) == 0, "creating thread should succeed");
 
     ASSERT (thread_create(t, NULL, NULL) != 0, "thread_create should fail if callback == NULL");   
-    ASSERT(thread_join(t, &res) == 0, "thread_join should succeed");
-    ASSERT (res == INCREMENT_RESULT, "result should be updated to the value returned by callback");
+    ASSERT(thread_join(t) == 0, "thread_join should succeed");
     ASSERT (a == 1, "variable should be modified by the thread");
 
     thread_free(&t);
@@ -55,56 +51,51 @@ TEST (thread_equal_test)
 {
     struct thread *t1 = NULL;
     struct thread *t2 = NULL;
-    ASSERT (thread_equal(NULL, NULL) != 0, "thread_equal should fail when NULLs passed in");
-    ASSERT (thread_equal(t1, NULL) != 0, "thread_equal should fail when a NULL is passed in");
-    ASSERT (thread_equal(NULL, t2) != 0, "thread_equal should fail when a NULL is passed in");
+    ASSERT(thread_equal(NULL, NULL) != 0, "thread_equal should fail when NULLs passed in");
+    ASSERT(thread_equal(t1, NULL) != 0, "thread_equal should fail when a NULL is passed in");
+    ASSERT(thread_equal(NULL, t2) != 0, "thread_equal should fail when a NULL is passed in");
 
     thread_new(&t1);
     thread_new(&t2);
     thread_create(t1, increment, NULL);
     thread_create(t2, increment, NULL);
-    ASSERT (thread_equal(t1, t1) != 0, "thread equal returns non-zero if they are equal");
-    ASSERT (thread_equal(t1, t2) == 0, "thread equal returns zero if not equal");
-    thread_join(t1, NULL);
-    thread_join(t2, NULL);
+    ASSERT(thread_equal(t1, t1) != 0, "thread equal returns non-zero if they are equal");
+    ASSERT(thread_equal(t1, t2) == 0, "thread equal returns zero if not equal");
+    thread_join(t1);
+    thread_join(t2);
     thread_free(&t1);
     thread_free(&t2);
     return 0;
 }
+
 
 TEST (thread_current_test)
 {
-    ASSERT (thread_current(NULL) != 0, "passing NULL to thread_current");
-    struct thread *t1 = NULL;
-    struct thread *t2 = NULL;
-    thread_new(&t1);
-    ASSERT (thread_current(&t1) == 0, "thread_current should succeed");
-    thread_new(&t2);
-    thread_create(t2, increment, NULL);
-    ASSERT (thread_equal(t1, t2) == 0, "current thread should be different than a spawned thread");
-    thread_join(t2, NULL);
-    thread_free(&t1);
-    thread_free(&t2);
+    ASSERT(thread_current(NULL) != 0, "passing NULL to thread_current returns non-zero");
+    thread_id_t id = 0;
+    ASSERT(thread_current(&id) == 0, "thread_current should return 0 on success");
     return 0;
 }
 
+
 TEST (thread_detach_test)
 {
-    ASSERT (thread_detach(NULL) != 0, "passing NULL to thread_detach");
-    struct thread *t;
+    ASSERT(thread_detach(NULL) != 0, "passing NULL to thread_detach");
+    struct thread *t = NULL;
     thread_new(&t);
     thread_create(t, increment, NULL);
-    ASSERT (0 == thread_detach(t), "thread should successfully detach");
+    ASSERT(0 == thread_detach(t), "thread should successfully detach");
     struct timespec ms = { .tv_nsec = 1000000 };
-    thread_sleep(&ms, NULL);
+    thread_sleep(&ms);
     // thread_free(&t);  - not needed; detached thread is auto cleaned up
     return 0;
 }
 
+
 TEST (thread_join_test)
 {
     // good cases already tested in other tests
-    ASSERT (thread_join(NULL, NULL) != 0, "passing NULL to thread_join should fail");
+    ASSERT(thread_join(NULL) != 0, "passing NULL to thread_join should fail");
     return 0;
 }
 

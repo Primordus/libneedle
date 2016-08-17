@@ -13,7 +13,7 @@ INCLUDES = [
 
 LIB_NAME = 'needle'
 this_env.Append(CPPPATH=INCLUDES)
-SOURCES = Glob('*.c')
+SOURCES = Glob('*.cpp')
 OBJECTS = this_env.SharedObject(SOURCES)
 
 

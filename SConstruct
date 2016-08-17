@@ -3,12 +3,12 @@ import os
 
 # Compiler settings:
 
-C_COMPILER = 'musl-clang'
+C_COMPILER = 'clang'
 CPP_COMPILER = 'clang++'
 ENABLED_C_WARNINGS = '-Werror -Weverything '
 ENABLED_CPP_WARNINGS = '-Werror -Weverything '
 SUPPRESSED_C_WARNINGS = '  -Wno-reserved-id-macro -Wno-unused-command-line-argument'
-SUPPRESSED_CPP_WARNINGS = '  '
+SUPPRESSED_CPP_WARNINGS = ' -Wno-c++98-compat '
 C_WARNINGS = ENABLED_C_WARNINGS + SUPPRESSED_C_WARNINGS
 CPP_WARNINGS = ENABLED_CPP_WARNINGS + SUPPRESSED_CPP_WARNINGS
 
@@ -17,10 +17,8 @@ CPP_FLAGS = '-O2 -pipe -g -fno-omit-frame-pointer -fstrict-overflow \
     -DNDEBUG -std=c++11 -stdlib=libc++ ' + CPP_WARNINGS
 C_FLAGS = '-O2 -pipe -g -fno-omit-frame-pointer -fstrict-overflow \
     -fstrict-aliasing -funsigned-char -feliminate-unused-debug-types \
-    -DNDEBUG -std=c11 -static -nostdinc -nostdlib ' + C_WARNINGS
-MUSL_INCLUDES = [
-    '/usr/lib/musl/include/'
-]
+    -DNDEBUG -std=c11 ' + C_WARNINGS
+
 
 # Setup environments:
 
@@ -28,7 +26,6 @@ MUSL_INCLUDES = [
 common_env = Environment(ENV=os.environ)
 common_env.Replace(CC=C_COMPILER, CXX=CPP_COMPILER)
 common_env.Append(CFLAGS=C_FLAGS, CXXFLAGS=CPP_FLAGS)
-common_env.Append(CPPPATH=MUSL_INCLUDES)
 
 if ARGUMENTS.get('V') != '1':
     # Invoke scons with V=1 to show verbose build output

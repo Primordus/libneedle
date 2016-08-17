@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -18,7 +19,8 @@ extern "C"
 
 struct thread;
 struct timespec;
-typedef int (*thread_start_t)(void *arg);
+typedef void (*thread_start_t)(void *arg);
+typedef size_t thread_id_t;
 
 
 /**
@@ -37,12 +39,11 @@ void thread_free(struct thread **t);
 
 int thread_create(struct thread *t, thread_start_t callback, void *arg);
 int thread_equal(const struct thread * const t1, const struct thread * const t2);  // non-0 if equal, else 0
-int thread_current(struct thread **t);
-int thread_sleep(const struct timespec* time_point, struct timespec *remaining);
+int thread_current(thread_id_t *id);
+int thread_sleep(const struct timespec *time_point);
 void thread_yield(void);
-_Noreturn void thread_exit(int result);
-int thread_detach(const struct thread *t);
-int thread_join(const struct thread *t, int *res);
+int thread_detach(struct thread *t);
+int thread_join(struct thread *t);
 
 #ifdef __cplusplus
 }

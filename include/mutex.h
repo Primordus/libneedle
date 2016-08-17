@@ -19,7 +19,8 @@ typedef enum
 {
     PLAIN,
     RECURSIVE,
-    TIMED
+    TIMED,
+    RECURSIVE_TIMED
 } mutex_type;
 
 
@@ -42,8 +43,8 @@ void mutex_free(struct mutex **m);
 
 int mutex_init(struct mutex *m, mutex_type type);
 int mutex_lock(struct mutex *m);
-int mutex_timedlock(struct mutex *restrict mutex, 
-                    const struct timespec *restrict timepoint);
+int mutex_timedlock(struct mutex *__restrict m, 
+                    const struct timespec *__restrict timepoint);
 int mutex_trylock(struct mutex *m);
 int mutex_unlock(struct mutex *m);
 void mutex_destroy(struct mutex *m);

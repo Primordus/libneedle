@@ -36,10 +36,10 @@ void cond_var_free(struct cond_var **cv);
 int cond_var_init(struct cond_var *cv);
 int cond_var_signal(struct cond_var *cv);
 int cond_var_broadcast(struct cond_var *cv);
-int cond_var_wait(struct cond_var *cv, struct mutex* m);
-int cond_var_timedwait(struct cond_var *restrict cv, struct mutex *restrict m,
-                       const struct timespec *restrict time_point);
-void cond_var_destroy(struct cond_var* cv);
+int cond_var_wait(struct cond_var *cv, struct mutex *m);
+int cond_var_timedwait(struct cond_var *__restrict cv, struct mutex *__restrict m,
+                       const struct timespec *__restrict time_point);
+void cond_var_destroy(struct cond_var *cv);
 
 #ifdef __cplusplus
 }
