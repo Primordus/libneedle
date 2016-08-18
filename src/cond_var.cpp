@@ -78,25 +78,25 @@ int cond_var_wait(struct cond_var *cv, struct mutex *m)
 
     switch (m->type)
     {
-    case PLAIN:
+    case PLAIN_MUTEX:
         {
             std::unique_lock<std::mutex> lock(m->data.mtx);
             cv->data.wait(lock);
         }
         return 0;
-    case RECURSIVE:
+    case RECURSIVE_MUTEX:
         {
             std::unique_lock<std::recursive_mutex> lock(m->data.rec_mtx);
             cv->data.wait(lock);
         }
         return 0;
-    case TIMED:
+    case TIMED_MUTEX:
         {
             std::unique_lock<std::timed_mutex> lock(m->data.timed_mtx);
             cv->data.wait(lock);
         }
         return 0;
-    case RECURSIVE_TIMED:
+    case RECURSIVE_TIMED_MUTEX:
         {
             std::unique_lock<std::recursive_timed_mutex> lock(m->data.rec_timed_mtx);
             cv->data.wait(lock);
@@ -122,22 +122,22 @@ int cond_var_timedwait(struct cond_var *__restrict cv, struct mutex *__restrict 
 
     switch (m->type)
     {
-    case PLAIN:
+    case PLAIN_MUTEX:
         {
             std::unique_lock<std::mutex> lock(m->data.mtx);
             return cv->data.wait_until(lock, point_in_time) == std::cv_status::timeout;
         }
-    case RECURSIVE:
+    case RECURSIVE_MUTEX:
         {
             std::unique_lock<std::recursive_mutex> lock(m->data.rec_mtx);
             return cv->data.wait_until(lock, point_in_time) == std::cv_status::timeout;
         }
-    case TIMED:
+    case TIMED_MUTEX:
         {
             std::unique_lock<std::timed_mutex> lock(m->data.timed_mtx);
             return cv->data.wait_until(lock, point_in_time) == std::cv_status::timeout;
         }
-    case RECURSIVE_TIMED:
+    case RECURSIVE_TIMED_MUTEX:
         {
             std::unique_lock<std::recursive_timed_mutex> lock(m->data.rec_timed_mtx);
             return cv->data.wait_until(lock, point_in_time) == std::cv_status::timeout;

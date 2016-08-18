@@ -127,7 +127,7 @@ TEST(cv_wait)
     cond_var_new(&cv);
     cond_var_init(cv);
     mutex_new(&m);
-    mutex_init(m, PLAIN);
+    mutex_init(m, PLAIN_MUTEX);
 
     ASSERT(cond_var_wait(NULL, NULL) != 0, "returns non-zero if NULLs passed in");
     ASSERT(cond_var_wait(NULL, m) != 0, "returns non-zero if a NULL is passed in");
@@ -149,7 +149,7 @@ TEST(cv_timedwait)
     cond_var_new(&cv);
     cond_var_init(cv);
     mutex_new(&m);
-    mutex_init(m, TIMED);
+    mutex_init(m, TIMED_MUTEX);
 
     ASSERT(cond_var_timedwait(NULL, NULL, NULL) != 0, "returns non-zero if NULLs passed in");
     ASSERT(cond_var_timedwait(NULL, m, NULL) != 0, "returns non-zero if a NULL is passed in");

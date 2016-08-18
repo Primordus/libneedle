@@ -17,10 +17,10 @@ extern "C"
 
 typedef enum
 {
-    PLAIN,
-    RECURSIVE,
-    TIMED,
-    RECURSIVE_TIMED
+    PLAIN_MUTEX,
+    RECURSIVE_MUTEX,
+    TIMED_MUTEX,
+    RECURSIVE_TIMED_MUTEX
 } mutex_type;
 
 
