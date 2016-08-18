@@ -103,17 +103,19 @@ int cond_var_wait(struct cond_var *cv, struct mutex *m)
         }
         return 0;
     }
+
+    return 5;
 }
 
 
 int cond_var_timedwait(struct cond_var *__restrict cv, struct mutex *__restrict m,
                        const struct timespec *__restrict timepoint)
 {
-    if (!cv) { return 1; }
-    if (!m) { return 2; }
-    if (!cv->is_initialized) { return 3; }
-    if (!m->is_initialized) { return 4; }
-    if (!timepoint) { return 5; }
+    if (!cv) { return 2; }
+    if (!m) { return 3; }
+    if (!cv->is_initialized) { return 4; }
+    if (!m->is_initialized) { return 5; }
+    if (!timepoint) { return 6; }
 
     auto d = std::chrono::duration_cast<std::chrono::system_clock::duration>(
              std::chrono::seconds(timepoint->tv_sec)
@@ -143,6 +145,8 @@ int cond_var_timedwait(struct cond_var *__restrict cv, struct mutex *__restrict 
             return cv->data.wait_until(lock, point_in_time) == std::cv_status::timeout;
         }
     }
+
+    return 7;
 }
 
 

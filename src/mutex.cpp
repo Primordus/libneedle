@@ -53,6 +53,8 @@ int mutex_init(struct mutex *m, mutex_type type)
         new (&m->data) std::recursive_timed_mutex;
         return 0;
     }
+    
+    return 3;
 }
 
 
@@ -76,6 +78,8 @@ int mutex_lock(struct mutex *m)
         m->data.rec_timed_mtx.lock();
         return 0;
     }
+
+    return 3;
 }
 
 
@@ -117,6 +121,8 @@ int mutex_trylock(struct mutex *m)
     case RECURSIVE_TIMED_MUTEX:
         return !m->data.rec_timed_mtx.try_lock();
     }
+
+    return 4;
 }
 
 
@@ -140,6 +146,8 @@ int mutex_unlock(struct mutex *m)
         m->data.rec_timed_mtx.unlock();
         return 0;
     }
+
+    return 3;
 }
 
 
