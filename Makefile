@@ -1,22 +1,24 @@
 
-SCONS=scons
-SCONS_FLAGS=--jobs=${shell grep -c '^processor' /proc/cpuinfo} -Q
-LIB_DIR=bin/src/
-TEST_ENV=LD_LIBRARY_PATH=${LIB_DIR} 
-TEST_COMMAND=./bin/tests/needle_tests
+NUM_CPUS=${shell grep -c '^processor' /proc/cpuinfo | wc -l}
+BUILD_DIR=build/
+TEST_COMMAND=./${BUILD_DIR}/tests/needle_tests
 
 
-build:
-	${SCONS} ${SCONS_FLAGS}
-
-tests: build
-	${TEST_ENV} ${TEST_COMMAND}
-
-gdb_tests: build
-	${TEST_ENV} gdb --args ${TEST_COMMAND}
+.PHONY: clean build all install tests
 
 clean:
-	${SCONS} ${SCONS_FLAGS} --clean
+	rm -rf ${BUILD_DIR}
 
-.PHONY: clean
+build:
+	mkdir -p ${BUILD_DIR}
+	cd ${BUILD_DIR} && cmake ..
+	make -C ${BUILD_DIR} -j ${NUM_CPUS}
+
+all: build
+
+install: build
+	sudo make -C ${BUILD_DIR} install
+
+tests: build
+	${TEST_COMMAND}
 
