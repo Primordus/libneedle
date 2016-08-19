@@ -1,5 +1,6 @@
 
 sudo: required
+dist: trusty  # Ubuntu 14.04
 language: cpp
 
 before_install:
@@ -9,7 +10,7 @@ before_install:
     - sudo apt-get update -qq
 
 install:
-    - sudo apt-get install libc6 gcc-6 g++-6  # TODO all the different compilers
+    - sudo apt-get install gcc-6 g++-6  # TODO all the different compilers
     - export CC=gcc-6
     - export CXX=g++-6
 
