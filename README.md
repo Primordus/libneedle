@@ -8,8 +8,8 @@ Built on top of the C++11 threading library.
 
 # Installation requirements
 
-- clang (> C++11) (or gcc if SConstruct file is modified)
-- SCons (only for building library)
+- C++ compiler (>= C++11)
+- cmake
 - make
 
 Build library with following command:
