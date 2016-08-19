@@ -1,9 +1,10 @@
-#include "cond_var_test_suite.h"
-#include <stdlib.h>  // malloc, free
+// Wrapper needed for making struct timespec available
 #include <time.h>    // struct timespec
+#include <stdlib.h>  // malloc, free
 #include <thread.h>
 #include <mutex.h>
 #include <cond_var.h>
+#include "cond_var_test_suite.h"
 
 
 static struct cond_var *cv;

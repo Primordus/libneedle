@@ -14,7 +14,7 @@ clean:
 build:
 	mkdir -p ${BUILD_DIR}
 	cd ${BUILD_DIR} && cmake ..
-	make -C ${BUILD_DIR} -j ${NUM_CPUS}
+	make -C ${BUILD_DIR} -j ${NUM_CPUS} VERBOSE=1
 
 install: build
 	sudo make -C ${BUILD_DIR} install
