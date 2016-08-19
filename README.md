@@ -1,6 +1,8 @@
 
 # libneedle
 
+[![Build Status](https://travis-ci.org/Primordus/libneedle.svg?branch=master)](https://travis-ci.org/Primordus/libneedle)
+
 A compact threading library for C.
 API is based upon the C11 thread support library.
 Built on top of the C++11 threading library.

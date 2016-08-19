@@ -1,9 +1,87 @@
 
+sudo: required
+dist: precise  # Ubuntu 12.04 (Precise Pangolin)
 language: cpp
 
-compiler:
-    - clang
-    - gcc
+before_install:
+    - unset CC
+    - unset CXX
+    - sudo apt-get update -qq
 
-sudo: false
+matrix:
+    include:
+        - compiler: gcc
+          addons:
+              apt:
+                  sources:
+                      - ubuntu-toolchain-r-test
+                  packages:
+                      - gcc-4.9
+                      - g++-4.9
+                  env: 
+                      - C_COMPILER=gcc-4.9
+                      - CXX_COMPILER=g++-4.9
+        - compiler: gcc
+          addons:
+              apt:
+                  sources:
+                      - ubuntu-toolchain-r-test
+                  packages:
+                      - gcc-5
+                      - g++-5
+                  env:
+                      - C_COMPILER=gcc-5
+                      - CXX_COMPILER=g++-5
+        - compiler: gcc
+          addons:
+              apt:
+                  sources:
+                      - ubuntu-toolchain-r-test
+                  packages:
+                      - gcc-6
+                      - g++-6
+                  env:
+                      - C_COMPILER=gcc-6
+                      - CXX_COMPILER=g++-6
+        - compiler: clang
+          addons:
+              apt:
+                  sources:
+                      - ubuntu-toolchain-r-test
+                      - llvm-toolchain-precise-3.6
+                  packages:
+                      - clang-3.6
+                  env:
+                      - C_COMPILER=clang-3.6 
+                      - CXX_COMPILER=clang++-3.6
+        - compiler: clang
+          addons:
+              apt:
+                  sources:
+                      - ubuntu-toolchain-r-test
+                      - llvm-toolchain-precise-3.7
+                  packages:
+                      - clang-3.7
+                  env:
+                      - C_COMPILER=clang-3.7
+                      - CXX_COMPILER=clang++-3.7
+        - compiler: clang
+          addons:
+              apt:
+                  sources:
+                      - ubuntu-toolchain-r-test
+                      - llvm-toolchain-precise-3.8
+                  packages:
+                      - clang-3.8
+                  env: 
+                      - C_COMPILER=clang-3.8
+                      - CXX_COMPILER=clang++-3.8
+
+
+script: 
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_C_COMPILER=$C_COMPILER -DCMAKE_CXX_COMPILER=$CXX_COMPILER .. 
+    - make -j4
+    - ./tests/needle_tests
 

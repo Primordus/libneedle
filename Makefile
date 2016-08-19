@@ -19,6 +19,6 @@ build:
 install: build
 	sudo make -C ${BUILD_DIR} install
 
-test: build
+tests: build
 	${TEST_COMMAND}
 
