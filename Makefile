@@ -1,10 +1,12 @@
 
-NUM_CPUS=${shell grep -c '^processor' /proc/cpuinfo | wc -l}
+NUM_CPUS=${shell grep -c '^processor' /proc/cpuinfo}
 BUILD_DIR=build/
 TEST_COMMAND=./${BUILD_DIR}/tests/needle_tests
 
 
-.PHONY: clean build all install tests
+.PHONY: all clean build install tests
+
+all: build
 
 clean:
 	rm -rf ${BUILD_DIR}
@@ -14,11 +16,9 @@ build:
 	cd ${BUILD_DIR} && cmake ..
 	make -C ${BUILD_DIR} -j ${NUM_CPUS}
 
-all: build
-
 install: build
 	sudo make -C ${BUILD_DIR} install
 
-tests: build
+test: build
 	${TEST_COMMAND}
 
