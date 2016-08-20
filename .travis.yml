@@ -1,12 +1,19 @@
 
-sudo: false
-dist: trusty  # Ubuntu 14.04
-language: cpp
+language: generic
+sudo: required
+services:
+    - docker
 
-compiler:
-    - clang
-    - gcc-6
+before_install:
+    - docker pull primordus/ubuntu-c-cxx-dev
+    - docker run -d primordus/ubuntu-c-cxx-dev tail -f /dev/null
+    - docker ps -a
+    - docker cp . $(docker ps -ql):/tmp/
+
+env:
+    # TODO add other compilers here!
+    - CC=gcc-6 CXX=g++-6
 
 script:
-    - make tests
+    - docker exec $(docker ps -ql) /bin/sh -c "cd /tmp && CC=${CC} CXX=${CXX} make tests"
 
