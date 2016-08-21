@@ -34,6 +34,7 @@ TEST (mutex_new_test)
     ASSERT(mutex_new(&m) != 0, "passing already allocated memory to mutex_new should fail.");
     free(m); m = NULL;
     ASSERT(mutex_new(&m) == 0, "should return 0 on success.");
+    ASSERT(mutex_new(&m) != 0, "trying to new twice should fail.");
 
     cleanup_mutex();
     return 0;
@@ -45,15 +46,16 @@ TEST (mutex_init_test)
     ASSERT(mutex_init(NULL, PLAIN_MUTEX) != 0, "passing NULL to init returns non-zero");
     mutex_new(&m);
     ASSERT(mutex_init(m, PLAIN_MUTEX) == 0, "returns 0 on success.");
-    mutex_free(&m);
+    ASSERT(mutex_init(m, PLAIN_MUTEX) != 0, "returns non-zero if trying to init twice.");
+    cleanup_mutex();
     mutex_new(&m);
     ASSERT(mutex_init(m, RECURSIVE_MUTEX) == 0, "returns 0 on success.");
-    mutex_free(&m);
+    cleanup_mutex();
     mutex_new(&m);
     ASSERT(mutex_init(m, TIMED_MUTEX) == 0, "returns 0 on success.");
-    mutex_free(&m);
+    cleanup_mutex();
     mutex_new(&m);
-
+    ASSERT(mutex_init(m, RECURSIVE_TIMED_MUTEX) == 0, "returns 0 on success.");
     cleanup_mutex();
     return 0;
 }
@@ -62,6 +64,7 @@ TEST (mutex_init_test)
 TEST (mutex_free_test) 
 {
     mutex_free(NULL);  // should be safe to pass in NULL
+    mutex_free(&m);    // should be safe to pass in pointer to null
 
     mutex_new(&m);
     ASSERT(m != NULL, "pointer shouldnt be NULL after mutex_new");
@@ -74,6 +77,8 @@ TEST (mutex_free_test)
 TEST (mutex_lock_test) 
 {
     mutex_new(&m);
+    ASSERT(mutex_lock(NULL) != 0, "lock returns non-zero if NULL passed in");
+    ASSERT(mutex_lock(m) != 0, "lock returns non-zero if mutex not initialized");
     mutex_init(m, PLAIN_MUTEX);
     ASSERT(mutex_lock(m) == 0, "lock returns 0 on success");
     ASSERT(mutex_unlock(m) == 0, "unlock returns O on success");
@@ -86,11 +91,29 @@ TEST (mutex_lock_test)
 TEST (mutex_timedlock_test) 
 {
     mutex_new(&m);
-    mutex_init(m, TIMED_MUTEX);
+    ASSERT(mutex_timedlock(NULL, NULL) != 0, "timedlock returns non-zero if NULL passed in");
+    ASSERT(mutex_timedlock(NULL, get_timepoint()) != 0, "timedlock returns non-zero if NULL passed in");
+    ASSERT(mutex_timedlock(m, get_timepoint()) != 0, "timedlock returns non-zero if mutex not initialized");
     
+    mutex_init(m, TIMED_MUTEX);
     ASSERT(mutex_timedlock(m, get_timepoint()) == 0, "timedlock returns 0 on success");
     ASSERT(mutex_unlock(m) == 0, "unlock returns O on success");
+    cleanup_mutex();
 
+    mutex_new(&m);
+    mutex_init(m, RECURSIVE_TIMED_MUTEX);
+    ASSERT(mutex_timedlock(m, get_timepoint()) == 0, "timedlock returns 0 on success");
+    ASSERT(mutex_unlock(m) == 0, "unlock returns O on success");
+    cleanup_mutex();
+
+    mutex_new(&m);
+    mutex_init(m, PLAIN_MUTEX);
+    ASSERT(mutex_timedlock(m, get_timepoint()) != 0, "timedlock returns non-zero if wrong type of mutex passed in");
+    cleanup_mutex();
+
+    mutex_new(&m);
+    mutex_init(m, RECURSIVE_MUTEX);
+    ASSERT(mutex_timedlock(m, get_timepoint()) != 0, "timedlock returns non-zero if wrong type of mutex passed in");
     cleanup_mutex();
     return 0;
 }
@@ -99,11 +122,11 @@ TEST (mutex_timedlock_test)
 TEST (mutex_trylock_test) 
 {
     mutex_new(&m);
-    mutex_init(m, TIMED_MUTEX);
+    ASSERT(mutex_trylock(m) != 0, "trylock returns non-zero if mutex not initialized");
     
+    mutex_init(m, TIMED_MUTEX);
     ASSERT(mutex_trylock(m) == 0, "trylock returns 0 on success");
     ASSERT(mutex_unlock(m) == 0, "unlock returns O on success");
-
     ASSERT(mutex_trylock(m) == 0, "trylock returns 0 on success");
     ASSERT(mutex_trylock(m) != 0, "trylock returns non zero if trying to lock twice");
     ASSERT(mutex_unlock(m) == 0, "unlock returns O on success");
@@ -118,6 +141,8 @@ TEST (mutex_unlock_test)
     ASSERT(mutex_unlock(NULL) != 0, "unlock should return non zero if NULL passed in");
     
     mutex_new(&m);
+    ASSERT(mutex_unlock(m) != 0, "unlock should return non-zero if mutex not initialized");
+
     mutex_init(m, PLAIN_MUTEX);
     ASSERT(mutex_unlock(m) == 0, "unlock should return zero if no lock was taken prior");
 
@@ -135,8 +160,11 @@ TEST (mutex_destroy_test)
     mutex_destroy(NULL);  // should be safe to pass in NULL
 
     mutex_new(&m);
+    mutex_destroy(m);     // should be safe in uninitialized mutex
+
     mutex_init(m, PLAIN_MUTEX);
     mutex_destroy(m);  // should work properly if mutex passed in 
+    mutex_destroy(m);  // should be safe to destroy mutex twice 
 
     cleanup_mutex();
     return 0;

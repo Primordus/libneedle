@@ -17,14 +17,14 @@ void increment(void *arg)
 TEST (thread_new_and_free_test) 
 {
     struct thread *t = NULL;
-    ASSERT (thread_new(NULL) != 0, "passing NULL to thread_new should fail");
+    ASSERT(thread_new(NULL) != 0, "passing NULL to thread_new should fail");
     t = malloc(get_thread_data_size());
-    ASSERT (thread_new(&t) != 0, "passing already allocated memory to thread_new should fail");
+    ASSERT(thread_new(&t) != 0, "passing already allocated memory to thread_new should fail");
     free(t); t = NULL;
-    ASSERT (thread_new(&t) == 0, "passing a non-initialized to thread_new should succeed");
+    ASSERT(thread_new(&t) == 0, "passing a non-initialized to thread_new should succeed");
 
     thread_free(&t);
-    ASSERT (t == NULL, "struct contains NULL again after freeing");
+    ASSERT(t == NULL, "struct contains NULL again after freeing");
     return 0;
 }
 
@@ -32,15 +32,16 @@ TEST (thread_new_and_free_test)
 TEST (thread_creation_and_destruction_test)
 {
     struct thread *t = NULL;
-    ASSERT (thread_create(NULL, NULL, NULL) != 0, "thread_create should fail if only NULL passed in");   
-    ASSERT (thread_create(NULL, increment, NULL) != 0, "thread_create should fail if thread arg == NULL");   
+    ASSERT(thread_create(NULL, NULL, NULL) != 0, "thread_create should fail if only NULL passed in");   
+    ASSERT(thread_create(NULL, increment, NULL) != 0, "thread_create should fail if thread arg == NULL");   
 
     thread_new(&t);
-    ASSERT (thread_create(t, increment, NULL) == 0, "creating thread should succeed");
+    ASSERT(thread_create(t, increment, NULL) == 0, "creating thread should succeed");
+    ASSERT(thread_create(t, increment, NULL) != 0, "creating thread twice should fail");
 
-    ASSERT (thread_create(t, NULL, NULL) != 0, "thread_create should fail if callback == NULL");   
+    ASSERT(thread_create(t, NULL, NULL) != 0, "thread_create should fail if callback == NULL");   
     ASSERT(thread_join(t) == 0, "thread_join should succeed");
-    ASSERT (a == 1, "variable should be modified by the thread");
+    ASSERT(a == 1, "variable should be modified by the thread");
 
     thread_free(&t);
     return 0;
@@ -51,15 +52,20 @@ TEST (thread_equal_test)
 {
     struct thread *t1 = NULL;
     struct thread *t2 = NULL;
-    ASSERT(thread_equal(NULL, NULL) != 0, "thread_equal should fail when NULLs passed in");
-    ASSERT(thread_equal(t1, NULL) != 0, "thread_equal should fail when a NULL is passed in");
-    ASSERT(thread_equal(NULL, t2) != 0, "thread_equal should fail when a NULL is passed in");
+    ASSERT(thread_equal(NULL, NULL) < 0, "thread_equal should fail when NULLs passed in");
+    ASSERT(thread_equal(t1, NULL) < 0, "thread_equal should fail when a NULL is passed in");
+    ASSERT(thread_equal(NULL, t2) < 0, "thread_equal should fail when a NULL is passed in");
 
     thread_new(&t1);
     thread_new(&t2);
+    ASSERT(thread_equal(t1, t2) < 0, "thread equal returns non-zero if both threads not initialized");
+    
     thread_create(t1, increment, NULL);
+    ASSERT(thread_equal(t1, t2) < 0, "thread equal returns non-zero if 1 thread is not initialized");
+    ASSERT(thread_equal(t2, t1) < 0, "thread equal returns non-zero if 1 thread is not initialized");
+
     thread_create(t2, increment, NULL);
-    ASSERT(thread_equal(t1, t1) != 0, "thread equal returns non-zero if they are equal");
+    ASSERT(thread_equal(t1, t1) == 1, "thread equal returns non-zero if they are equal");
     ASSERT(thread_equal(t1, t2) == 0, "thread equal returns zero if not equal");
     thread_join(t1);
     thread_join(t2);
@@ -74,6 +80,7 @@ TEST (thread_current_test)
     ASSERT(thread_current(NULL) != 0, "passing NULL to thread_current returns non-zero");
     thread_id_t id = 0;
     ASSERT(thread_current(&id) == 0, "thread_current should return 0 on success");
+    ASSERT(id != 0, "thread ID should contain a 64 bit hash (non-zero)");
     return 0;
 }
 
@@ -83,8 +90,9 @@ TEST (thread_detach_test)
     ASSERT(thread_detach(NULL) != 0, "passing NULL to thread_detach");
     struct thread *t = NULL;
     thread_new(&t);
+    ASSERT(thread_detach(t) != 0, "thread should fail to detach if not initialized");
     thread_create(t, increment, NULL);
-    ASSERT(0 == thread_detach(t), "thread should successfully detach");
+    ASSERT(thread_detach(t) == 0, "thread should successfully detach");
     struct timespec ms = { .tv_nsec = 1000000 };
     thread_sleep(&ms);
     // thread_free(&t);  - not needed; detached thread is auto cleaned up
@@ -94,8 +102,12 @@ TEST (thread_detach_test)
 
 TEST (thread_join_test)
 {
-    // good cases already tested in other tests
+    // other cases already tested in other tests
     ASSERT(thread_join(NULL) != 0, "passing NULL to thread_join should fail");
+    struct thread *t = NULL;
+    thread_new(&t);
+    ASSERT(thread_join(t) != 0, "thread_join should fail if thread not initialized");
+    thread_free(&t);
     return 0;
 }
 

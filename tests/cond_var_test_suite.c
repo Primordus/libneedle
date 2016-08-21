@@ -7,9 +7,9 @@
 #include "cond_var_test_suite.h"
 
 
-static struct cond_var *cv;
-static struct mutex *m;
-static struct thread *t;
+static struct cond_var *cv = NULL;
+static struct mutex *m = NULL;
+static struct thread *t = NULL;
 
 static void make_dummy_thread(thread_start_t cb);
 static void dummy_thread_cb(void *arg);
@@ -81,6 +81,7 @@ TEST(cv_new)
 TEST(cv_free)
 {
     cond_var_free(NULL);  // should be safe to pass in NULL
+    cond_var_free(&cv);   // should be safe to pass in pointer to NULL
 
     cond_var_new(&cv);
     ASSERT(cv != NULL, "pointer should not be NULL after cond_var_new");
@@ -95,6 +96,7 @@ TEST(cv_init)
     ASSERT(cond_var_init(NULL) != 0, "passing NULL to init returns non-zero");
     cond_var_new(&cv);
     ASSERT(cond_var_init(cv) == 0, "returns 0 on success.");
+    ASSERT(cond_var_init(cv) != 0, "returns non-zero if trying to initialize twice.");
     cond_var_free(&cv);
     cleanup_cv();
     return 0;
@@ -105,6 +107,7 @@ TEST(cv_signal)
 {
     ASSERT(cond_var_signal(NULL) != 0, "passing NULL to signal returns non-zero");
     cond_var_new(&cv);
+    ASSERT(cond_var_signal(cv) != 0, "returns non-zero if cv not initialized.");
     cond_var_init(cv);
     ASSERT(cond_var_signal(cv) == 0, "returns 0 on success.");
     cleanup_cv();
@@ -116,6 +119,7 @@ TEST(cv_broadcast)
 {
     ASSERT(cond_var_broadcast(NULL) != 0, "passing NULL to broadcast returns non-zero");
     cond_var_new(&cv);
+    ASSERT(cond_var_broadcast(cv) != 0, "returns non-zero if cv not initialized.");
     cond_var_init(cv);
     ASSERT(cond_var_broadcast(cv) == 0, "returns 0 on success.");
     cleanup_cv();
@@ -126,8 +130,11 @@ TEST(cv_broadcast)
 TEST(cv_wait)
 {
     cond_var_new(&cv);
-    cond_var_init(cv);
     mutex_new(&m);
+
+    ASSERT(cond_var_wait(cv, m) != 0, "returns non-zero if cv and mutex not initialized");
+    cond_var_init(cv);
+    ASSERT(cond_var_wait(cv, m) != 0, "returns zero if mutex not initialized");
     mutex_init(m, PLAIN_MUTEX);
 
     ASSERT(cond_var_wait(NULL, NULL) != 0, "returns non-zero if NULLs passed in");
@@ -136,7 +143,12 @@ TEST(cv_wait)
 
     make_dummy_thread(dummy_thread_cb);
     ASSERT(cond_var_wait(cv, m) == 0, "returns zero on success");
+    cleanup_all();
 
+    cond_var_new(&cv);
+    mutex_new(&m);
+    mutex_init(m, PLAIN_MUTEX);
+    ASSERT(cond_var_wait(cv, m) != 0, "returns zero if cond var not initialized");
     cleanup_all();
     return 0;
 }
@@ -147,9 +159,21 @@ TEST(cv_timedwait)
     struct timespec two_ms;
     timespec_get(&two_ms, TIME_UTC);
     two_ms.tv_nsec += 2000000;
+
     cond_var_new(&cv);
-    cond_var_init(cv);
     mutex_new(&m);
+    ASSERT(cond_var_timedwait(cv, m, &two_ms) != 0, "returns non-zero if cond var and mutex not initialized");
+    cond_var_init(cv);
+    ASSERT(cond_var_timedwait(cv, m, &two_ms) != 0, "returns non-zero if mutex not initialized");
+    cond_var_destroy(cv);
+    mutex_init(m, TIMED_MUTEX);
+    ASSERT(cond_var_timedwait(cv, m, &two_ms) != 0, "returns non-zero if cond var not initialized");
+    cleanup_all();
+
+
+    cond_var_new(&cv);
+    mutex_new(&m);
+    cond_var_init(cv);
     mutex_init(m, TIMED_MUTEX);
 
     ASSERT(cond_var_timedwait(NULL, NULL, NULL) != 0, "returns non-zero if NULLs passed in");
@@ -163,7 +187,38 @@ TEST(cv_timedwait)
     two_ms.tv_nsec += 2000000;
     make_dummy_thread(dummy_thread_cb);
     ASSERT(cond_var_timedwait(cv, m, &two_ms) == 0, "returns zero on success");
+    cleanup_all();
 
+    // other mutex types
+
+    cond_var_new(&cv);
+    mutex_new(&m);
+    cond_var_init(cv);
+    mutex_init(m, RECURSIVE_TIMED_MUTEX);
+    timespec_get(&two_ms, TIME_UTC);
+    two_ms.tv_nsec += 2000000;
+    make_dummy_thread(dummy_thread_cb);
+    ASSERT(cond_var_timedwait(cv, m, &two_ms) == 0, "returns zero on success");
+    cleanup_all();
+
+    cond_var_new(&cv);
+    mutex_new(&m);
+    cond_var_init(cv);
+    mutex_init(m, PLAIN_MUTEX);
+    timespec_get(&two_ms, TIME_UTC);
+    two_ms.tv_nsec += 2000000;
+    make_dummy_thread(dummy_thread_cb);
+    ASSERT(cond_var_timedwait(cv, m, &two_ms) == 0, "returns zero on success");
+    cleanup_all();
+
+    cond_var_new(&cv);
+    mutex_new(&m);
+    cond_var_init(cv);
+    mutex_init(m, RECURSIVE_MUTEX);
+    timespec_get(&two_ms, TIME_UTC);
+    two_ms.tv_nsec += 2000000;
+    make_dummy_thread(dummy_thread_cb);
+    ASSERT(cond_var_timedwait(cv, m, &two_ms) == 0, "returns zero on success");
     cleanup_all();
     return 0;
 }
@@ -174,6 +229,7 @@ TEST(cv_destroy)
     cond_var_destroy(NULL);  // safe to pass in NULL
 
     cond_var_new(&cv);
+    cond_var_destroy(cv);  // safe to pass in uninitialized cond_var
     cond_var_init(cv);
     cond_var_destroy(cv);  // should work properly if cond_var passed in
 

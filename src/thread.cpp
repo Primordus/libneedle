@@ -45,6 +45,7 @@ int thread_create(struct thread *t, thread_start_t callback, void *arg)
 {
     if (!t) { return 1; }
     if (!callback) { return 2; }
+    if (t->is_initialized) { return 3; }
     new (&t->data) std::thread(callback, arg);
     t->is_initialized = true;
     return 0;
@@ -53,10 +54,10 @@ int thread_create(struct thread *t, thread_start_t callback, void *arg)
 
 int thread_equal(const struct thread * const t1, const struct thread * const t2)
 {
-    if (!t1) { return 1; }
-    if (!t2) { return 2; }
-    if (!t1->is_initialized) { return 3; }
-    if (!t2->is_initialized) { return 4; }
+    if (!t1) { return -1; }
+    if (!t2) { return -2; }
+    if (!t1->is_initialized) { return -3; }
+    if (!t2->is_initialized) { return -4; }
     return t1->data.get_id() == t2->data.get_id();
 }
 
